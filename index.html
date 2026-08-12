@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GadgetStore Pro - Katalog Pembeli</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #16002e, #35006b, #12002b);
+            background-size: 300% 300%;
+            animation: bgMove 12s ease infinite;
+            color: white;
+            padding-bottom: 50px;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+
+            background: rgba(31, 0, 65, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,.15);
+            box-shadow: 0 8px 30px rgba(0,0,0,.35);
+        }
+
+        header h1 {
+            color: #e9d5ff;
+            font-size: 1.3rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .btn-header {
+            border: none;
+            border-radius: 20px;
+            padding: 8px 14px;
+            color: white;
+            background: linear-gradient(135deg,#7c3aed,#c026d3);
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(168,85,247,.3);
+            transition: .3s;
+        }
+
+        .btn-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(192,38,211,.5);
+        }
+
+        .cart-badge {
+            background: #f43f5e;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-size: .7rem;
+        }
+
+        .btn-exit {
+            background: transparent;
+            border: 1px solid #c084fc;
+            color: #e9d5ff;
+            padding: 7px 12px;
+            border-radius: 8px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 25px auto;
+            padding: 0 15px;
+        }
+
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .welcome-title {
+            font-size: 1.5rem;
+            color: #f3e8ff;
+        }
+
+        .welcome-title span {
+            color: #d8b4fe;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 13px 18px 13px 45px;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 30px;
+            outline: none;
+            background: rgba(255,255,255,.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: .9rem;
+        }
+
+        .search-box input::placeholder {
+            color: #d8b4fe;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: rgba(255,255,255,.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 18px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: .35s;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(168,85,247,.35);
+            border-color: #c084fc;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        .product-card h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .price {
+            color: #d8b4fe;
+            font-size: 1.05rem;
+            font-weight: bold;
+        }
+
+        .click-hint {
+            margin-top: 10px;
+            color: #c4b5fd;
+            font-size: .7rem;
+            text-align: right;
+        }
+
+        /* MODAL */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(12,0,25,.85);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 850px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: linear-gradient(135deg,#24103d,#35105c);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 20px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            position: relative;
+            box-shadow: 0 25px 70px rgba(0,0,0,.6);
+        }
+
+        @media(max-width:700px) {
+            .modal-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 18px;
+            top: 10px;
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .modal-left img {
+            width: 100%;
+            max-height: 230px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .media-container {
+            margin-top: 10px;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .video-iframe {
+            width: 100%;
+            height: 220px;
+            border: none;
+        }
+
+        .modal-right h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-price {
+            color: #d8b4fe;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .modal-right p {
+            color: #ddd6fe;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .qty-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .qty-selector input {
+            width: 65px;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            text-align: center;
+        }
+
+        .btn-add-cart {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg,#7c3aed,#db2777);
+            color: white;
+            font-weight: bold;
+            transition: .3s;
+        }
+
+        .btn-add-cart:hover {
+            transform: scale(1.02);
+        }
+
+        .cart-modal {
+            max-width: 500px;
+            grid-template-columns: 1fr;
+        }
+
+        .cart-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,.15);
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .cart-total {
+            text-align: right;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #d8b4fe;
+            margin: 15px 0;
+        }
+
+        .cart-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-checkout,
+        .btn-clear {
+            flex: 1;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-checkout {
+            background: #10b981;
+        }
+
+        .btn-clear {
+            background: #ef4444;
+        }
+
+        .order-card-buyer {
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: .7rem;
+            font-weight: bold;
+        }
+
+        .status-proses {
+            background: #fef08a;
+            color: #713f12;
+        }
+
+        .status-jalan {
+            background: #bae6fd;
+            color: #075985;
+        }
+
+        .status-sampai {
+            background: #bbf7d0;
+            color: #166534;
+        }
+
+        .status-selesai {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>💜 GadgetStore</h1>
+
+    <div class="header-actions">
+        <button class="btn-header" onclick="openStatusModal()">
+            📦 Lacak
+        </button>
+
+        <button class="btn-header" onclick="openCartModal()">
+            🛒 Keranjang
+            <span class="cart-badge" id="cartCount">0</span>
+        </button>
+
+        <button class="btn-exit" onclick="window.location.href='index.html'">
+            Keluar
+        </button>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="top-section">
+        <h2 class="welcome-title">
+            Halo, <span id="displayName">Pelanggan</span>! 👋
+        </h2>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Cari gadget favoritmu..."
+                oninput="searchProducts()"
+            >
+        </div>
+    </div>
+
+    <div class="product-grid" id="buyerProductGrid"></div>
+
+</div>
+
+
+<!-- DETAIL PRODUK -->
+
+<div class="modal-overlay" id="productModal">
+
+    <div class="modal-content">
+
+        <span class="close-modal" onclick="closeProductModal()">
+            &times;
+        </span>
+
+        <div class="modal-left">
+
+            <img id="modalImg" src="" alt="Produk">
+
+            <p style="margin-top:10px;">
+                🎥 Video Produk
+            </p>
+
+            <div class="media-container" id="mediaContainer"></div>
+
+        </div>
+
+        <div class="modal-right">
+
+            <h2 id="modalTitle">
+                Nama Produk
+            </h2>
+
+            <div class="modal-price" id="modalPrice">
+                Rp 0
+            </div>
+
+            <p id="modalDesc">
+                Deskripsi produk
+            </p>
+
+            <div class="qty-selector">
+
+                <label>Jumlah:</label>
+
+                <input
+                    type="number"
+                    id="buyQty"
+                    value="1"
+                    min="1"
+                >
+
+            </div>
+
+            <button
+                class="btn-add-cart"
+                onclick="addToCart()"
+            >
+                🛒 Masukkan ke Keranjang
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- KERANJANG -->
+
+<div class="modal-overlay" id="cartModal">
+
+    <div class="modal-content cart-modal">
+
+        <span class="close-modal" onclick="closeCartModal()">
+            &times;
+        </span>
+
+        <h2>🛒 Keranjang Belanja</h2>
+
+        <div id="cartItemsList"></div>
+
+        <div class="cart-total" id="cartTotalText">
+            Total: Rp 0
+        </div>
+
+        <div class="cart-actions">
+
+            <button class="btn-clear" onclick="clearCart()">
+                Kosongkan
+            </button>
+
+            <button class="btn-checkout" onclick="checkout()">
+                Checkout
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- STATUS PESANAN -->
+
+<div class="modal-overlay" id="statusModal">
+
+    <div class="modal-content cart-modal">
+
+        <span class="close-modal" onclick="closeStatusModal()">
+            &times;
+        </span>
+
+        <h2>📦 Status Pesanan</h2>
+
+        <div id="buyerOrdersList"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const buyerName =
+    localStorage.getItem("buyerName") || "Pelanggan";
+
+document.getElementById("displayName").innerText =
+    buyerName;
+
+
+/* =================================================
+   DATA PRODUK
+================================================= */
+
+let products = [
+
+    {
+        id: 1,
+        nama: "iPhone 16 Pro",
+        harga: 18999000,
+        deskripsi:
+            "Smartphone premium dengan kamera canggih, layar Super Retina XDR, dan performa tinggi.",
+        gambar:
+            "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?q=80&w=600",
+        ytVideo:
+            "https://www.youtube.com/embed/70gCxCTpvBg"
+    },
+
+    {
+        id: 2,
+        nama: "Samsung Galaxy S25 Ultra",
+        harga: 19999000,
+        deskripsi:
+            "Smartphone flagship dengan kamera berkualitas tinggi, S Pen, dan performa luar biasa.",
+        gambar:
+            "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600",
+        ytVideo:
+            "https://www.youtube.com/embed/q7Ura_0SwA0"
+    },
+
+    {
+        id: 3,
+        nama: "Google Pixel 9 Pro",
+        harga: 15999000,
+        deskripsi:
+            "Smartphone modern dengan teknologi AI, kamera profesional, dan layar OLED yang tajam.",
+        gambar:
+            "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600",
+        ytVideo:
+            "https://www.youtube.com/embed/GNuXueQ1BYc"
+    },
+
+    {
+        id: 4,
+        nama: "Apple Watch Series 10",
+        harga: 7999000,
+        deskripsi:
+            "Smartwatch elegan untuk aktivitas sehari-hari dengan berbagai fitur kesehatan dan olahraga.",
+        gambar:
+            "https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=600",
+        ytVideo:
+            "https://www.youtube.com/embed/Da37NojiHnI"
+    },
+
+    {
+        id: 5,
+        nama: "Sony WH-1000XM5",
+        harga: 5999000,
+        deskripsi:
+            "Headphone wireless premium dengan fitur noise cancelling dan kualitas suara yang jernih.",
+        gambar:
+            "https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=600",
+        ytVideo:
+            "https://www.youtube.com/embed/TkcoGzzrMRI"
+    }
+
+];
+
+
+let cart =
+    JSON.parse(localStorage.getItem("buyerCart")) || [];
+
+let selectedProduct = null;
+
+
+/* =================================================
+   TAMPILKAN PRODUK
+================================================= */
+
+function renderBuyerProducts(list = products) {
+
+    const grid =
+        document.getElementById("buyerProductGrid");
+
+    grid.innerHTML = "";
+
+    if (list.length === 0) {
+
+        grid.innerHTML = `
+            <p style="
+                grid-column:1/-1;
+                text-align:center;
+                padding:40px;
+                color:#ddd6fe;
+            ">
+                🔍 Produk tidak ditemukan
+            </p>
+        `;
+
+        return;
+    }
+
+
+    list.forEach(p => {
+
+        const card =
+            document.createElement("div");
+
+        card.className = "product-card";
+
+        card.onclick =
+            () => openProductModal(p);
+
+        card.innerHTML = `
+
+            <img
+                src="${p.gambar}"
+                alt="${p.nama}"
+                onerror="
+                    this.src='https://via.placeholder.com/500x300?text=Gadget'
+                "
+            >
+
+            <div class="card-body">
+
+                <h3>${p.nama}</h3>
+
+                <div class="price">
+                    Rp ${Number(p.harga).toLocaleString("id-ID")}
+                </div>
+
+                <div class="click-hint">
+                    🔍 Klik untuk detail & video
+                </div>
+
+            </div>
+        `;
+
+        grid.appendChild(card);
+
+    });
+
+    updateCartBadge();
+}
+
+
+/* =================================================
+   SEARCH
+================================================= */
+
+function searchProducts() {
+
+    const query =
+        document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const filtered =
+        products.filter(p =>
+            p.nama.toLowerCase().includes(query) ||
+            p.deskripsi.toLowerCase().includes(query)
+        );
+
+    renderBuyerProducts(filtered);
+}
+
+
+/* =================================================
+   DETAIL PRODUK + VIDEO YOUTUBE
+================================================= */
+
+function openProductModal(p) {
+
+    selectedProduct = p;
+
+    document.getElementById("modalTitle")
+        .innerText = p.nama;
+
+    document.getElementById("modalPrice")
+        .innerText =
+        "Rp " +
+        Number(p.harga).toLocaleString("id-ID");
+
+    document.getElementById("modalDesc")
+        .innerText = p.deskripsi;
+
+    document.getElementById("modalImg")
+        .src = p.gambar;
+
+    document.getElementById("buyQty")
+        .value = 1;
+
+
+    const media =
+        document.getElementById("mediaContainer");
+
+    media.innerHTML = "";
+
+
+    if (p.ytVideo) {
+
+        media.innerHTML = `
+            <iframe
+                src="${p.ytVideo}"
+                class="video-iframe"
+                allowfullscreen>
+            </iframe>
+        `;
+
+    } else {
+
+        media.innerHTML = `
+            <p style="
+                color:white;
+                text-align:center;
+                padding:20px;
+            ">
+                Video tidak tersedia
+            </p>
+        `;
+    }
+
+
+    document.getElementById("productModal")
+        .style.display = "flex";
+}
+
+
+function closeProductModal() {
+
+    document.getElementById("productModal")
+        .style.display = "none";
+
+    document.getElementById("mediaContainer")
+        .innerHTML = "";
+}
+
+
+/* =================================================
+   TAMBAH KERANJANG
+================================================= */
+
+function addToCart() {
+
+    const qty =
+        parseInt(
+            document.getElementById("buyQty").value
+        ) || 1;
+
+    const existing =
+        cart.find(item =>
+            item.id === selectedProduct.id
+        );
+
+
+    if (existing) {
+
+        existing.qty += qty;
+
+    } else {
+
+        cart.push({
+
+            id: selectedProduct.id,
+
+            nama: selectedProduct.nama,
+
+            harga: selectedProduct.harga,
+
+            qty: qty
+
+        });
+
+    }
+
+
+    localStorage.setItem(
+        "buyerCart",
+        JSON.stringify(cart)
+    );
+
+    updateCartBadge();
+
+    closeProductModal();
+
+    alert(
+        `${qty} ${selectedProduct.nama} berhasil masuk keranjang!`
+    );
+}
+
+
+/* =================================================
+   BADGE KERANJANG
+================================================= */
+
+function updateCartBadge() {
+
+    const total =
+        cart.reduce(
+            (sum,item) =>
+            sum + item.qty,
+            0
+        );
+
+    document.getElementById("cartCount")
+        .innerText = total;
+}
+
+
+/* =================================================
+   MODAL KERANJANG
+================================================= */
+
+function openCartModal() {
+
+    const list =
+        document.getElementById("cartItemsList");
+
+    list.innerHTML = "";
+
+    let total = 0;
+
+
+    if (cart.length === 0) {
+
+        list.innerHTML = `
+            <p style="
+                text-align:center;
+                color:#ddd6fe;
+                padding:20px;
+            ">
+                🛒 Keranjang masih kosong
+            </p>
+        `;
+
+    } else {
+
+        cart.forEach(item => {
+
+            const subtotal =
+                item.harga * item.qty;
+
+            total += subtotal;
+
+
+            const div =
+                document.createElement("div");
+
+            div.className = "cart-item";
+
+            div.innerHTML = `
+
+                <div>
+
+                    <strong>${item.nama}</strong>
+
+                    <br>
+
+                    <small>
+                        ${item.qty} ×
+                        Rp ${Number(item.harga)
+                        .toLocaleString("id-ID")}
+                    </small>
+
+                </div>
+
+                <strong>
+                    Rp ${Number(subtotal)
+                    .toLocaleString("id-ID")}
+                </strong>
+
+            `;
+
+            list.appendChild(div);
+
+        });
+
+    }
+
+
+    document.getElementById("cartTotalText")
+        .innerText =
+        "Total: Rp " +
+        Number(total).toLocaleString("id-ID");
+
+
+    document.getElementById("cartModal")
+        .style.display = "flex";
+}
+
+
+function closeCartModal() {
+
+    document.getElementById("cartModal")
+        .style.display = "none";
+}
+
+
+/* =================================================
+   KOSONGKAN KERANJANG
+================================================= */
+
+function clearCart() {
+
+    if (!confirm("Kosongkan keranjang?"))
+        return;
+
+    cart = [];
+
+    localStorage.removeItem("buyerCart");
+
+    updateCartBadge();
+
+    openCartModal();
+}
+
+
+/* =================================================
+   CHECKOUT
+================================================= */
+
+function checkout() {
+
+    if (cart.length === 0) {
+
+        alert("Keranjang masih kosong!");
+
+        return;
+    }
+
+
+    const orders =
+        JSON.parse(
+            localStorage.getItem("gadgetOrders")
+        ) || [];
+
+
+    const total =
+        cart.reduce(
+            (sum,item) =>
+            sum + item.harga * item.qty,
+            0
+        );
+
+
+    const newOrder = {
+
+        id:
+            Math.floor(
+                100000 +
+                Math.random() * 900000
+            ),
+
+        buyerName: buyerName,
+
+        date:
+            new Date()
+            .toLocaleDateString("id-ID"),
+
+        items: [...cart],
+
+        total: total,
+
+        status: "Sedang Diproses"
+
+    };
+
+
+    orders.push(newOrder);
+
+
+    localStorage.setItem(
+        "gadgetOrders",
+        JSON.stringify(orders)
+    );
+
+
+    alert(
+        `Pesanan #${newOrder.id} berhasil checkout!`
+    );
+
+
+    cart = [];
+
+    localStorage.removeItem("buyerCart");
+
+    updateCartBadge();
+
+    closeCartModal();
+}
+
+
+/* =================================================
+   STATUS PESANAN
+================================================= */
+
+function openStatusModal() {
+
+    const container =
+        document.getElementById("buyerOrdersList");
+
+    container.innerHTML = "";
+
+
+    const orders =
+        JSON.parse(
+            localStorage.getItem("gadgetOrders")
+        ) || [];
+
+
+    const myOrders =
+        orders.filter(
+            o => o.buyerName === buyerName
+        );
+
+
+    if (myOrders.length === 0) {
+
+        container.innerHTML = `
+            <p style="
+                text-align:center;
+                color:#ddd6fe;
+                padding:20px;
+            ">
+                📦 Belum ada pesanan
+            </p>
+        `;
+
+    } else {
+
+        myOrders.forEach(ord => {
+
+            let badge =
+                "status-proses";
+
+            let icon = "⏳";
+
+
+            if (
+                ord.status ===
+                "Dalam Perjalanan"
+            ) {
+
+                badge = "status-jalan";
+                icon = "🚚";
+
+            } else if (
+                ord.status ===
+                "Sudah Sampai"
+            ) {
+
+                badge = "status-sampai";
+                icon = "✅";
+
+            } else if (
+                ord.status === "Selesai"
+            ) {
+
+                badge = "status-selesai";
+                icon = "🎉";
+            }
+
+
+            const items =
+                ord.items
+                .map(
+                    i =>
+                    `${i.nama} (${i.qty}x)`
+                )
+                .join(", ");
+
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "order-card-buyer";
+
+
+            div.innerHTML = `
+
+                <strong>
+                    Order #${ord.id}
+                </strong>
+
+                <span class="
+                    status-badge ${badge}
+                ">
+                    ${icon} ${ord.status}
+                </span>
+
+                <p style="margin-top:8px;">
+                    Tanggal: ${ord.date}
+                </p>
+
+                <p>
+                    Barang: ${items}
+                </p>
+
+                <strong style="color:#d8b4fe;">
+                    Total:
+                    Rp ${Number(ord.total)
+                    .toLocaleString("id-ID")}
+                </strong>
+
+            `;
+
+
+            container.appendChild(div);
+
+        });
+
+    }
+
+
+    document.getElementById("statusModal")
+        .style.display = "flex";
+}
+
+
+function closeStatusModal() {
+
+    document.getElementById("statusModal")
+        .style.display = "none";
+}
+
+
+/* =================================================
+   JALANKAN
+================================================= */
+
+renderBuyerProducts();
+
+</script>
+
+</body>
+</html>
